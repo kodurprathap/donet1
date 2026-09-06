@@ -44,7 +44,7 @@ jobs:
           - name: Publish
             run: |
                 cd Netflix
-                dotnet publish --configuration Release --output ./publish
+                dotnet publish --configuration Release --output ./Netflix/publish
 
           - name: Deploy to Azure Web App
             uses: azure/webapps-deploy@v2  
