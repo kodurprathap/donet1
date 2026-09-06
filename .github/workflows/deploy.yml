@@ -1,0 +1,53 @@
+name: Terraform-infra + Deployment-dotnetapp
+on:
+  workflow_dispatch:
+
+jobs: 
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v6
+
+          - name: Setup Terraform
+            uses: hashicorp/setup-terraform@v3
+
+          - name: azure login
+            uses: azure/login@v1
+            with:
+              creds: ${{ secrets.AZURE_CREDENTIALS }} 
+
+          - name: Terraform Init
+            run: |
+                cd Terraform
+                terraform init  
+              
+          - name: Terraform apply
+            run: |
+                cd Terraform
+                terraform apply -auto-approve   
+                
+          - name: Setup .NET
+            uses: actions/setup-dotnet@v6
+            with:
+                dotnet-version: '10.0.x'
+
+          - name: Restore dependencies 
+            run: |
+                cd Netflix
+                dotnet restore
+          - name: Build
+            run: |
+                cd Netflix
+                dotnet build --configuration Release   
+
+          - name: Publish
+            run: |
+                cd Netflix
+                dotnet publish --configuration Release --output ./publish
+
+          - name: Deploy to Azure Web App
+            uses: azure/webapps-deploy@v2  
+            with:
+                app-name: "webapp-Netflix1981"
+                package: ./Netflix/publish    
