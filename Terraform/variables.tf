@@ -7,7 +7,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "Azure region for the resources"
   type        = string
-  default     = "East US"
+  default     = "centralus"
 }
 
 variable "ASP_NAME" {
